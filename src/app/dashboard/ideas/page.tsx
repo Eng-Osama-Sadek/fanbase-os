@@ -30,7 +30,10 @@ export default async function IdeasPage() {
         </div>
         <div className="flex gap-2">
           {["All", "Promoted", "Approved", "Pending"].map((filter) => (
-            <button key={filter} className="px-3 py-1.5 text-sm rounded-lg bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 transition-colors">
+            <button
+              key={filter}
+              className="px-3 py-1.5 text-sm rounded-lg bg-gray-900 border border-gray-800 hover:bg-gray-800 text-gray-300 transition-colors"
+            >
               {filter}
             </button>
           ))}
@@ -41,27 +44,42 @@ export default async function IdeasPage() {
         {ideas.map((idea) => {
           const config = statusConfig[idea.status] || statusConfig.PENDING;
           const StatusIcon = config.icon;
+          const score = idea.aiScore ?? 0;
+
           return (
-            <Card key={idea.id} className="bg-gray-900 border-gray-800 hover:border-purple-500/30 transition-all">
+            <Card
+              key={idea.id}
+              className="bg-gray-900 border-gray-800 hover:border-purple-500/30 transition-all"
+            >
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-white">{idea.title}</h3>
-                      <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 ${config.color}`}>
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 ${config.color}`}
+                      >
                         <StatusIcon size={12} /> {idea.status}
                       </span>
                     </div>
                     <p className="text-sm text-gray-400 mb-3">{idea.content}</p>
                     <div className="flex items-center gap-4 text-xs text-gray-500">
-                      <span>by <span className="text-gray-300">{idea.author.name}</span></span>
-                      <span>in <span className="text-purple-400">{idea.community.name}</span></span>
-                      <span className="flex items-center gap-1"><TrendingUp size={12} /> {Math.floor(idea.aiScore * 15)} votes</span>
-                      <span className="flex items-center gap-1"><MessageSquare size={12} /> {Math.floor(idea.aiScore / 3)} comments</span>
+                      <span>
+                        by <span className="text-gray-300">{idea.author.name}</span>
+                      </span>
+                      <span>
+                        in <span className="text-purple-400">{idea.community.name}</span>
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <TrendingUp size={12} /> {Math.floor(score * 15)} votes
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MessageSquare size={12} /> {Math.floor(score / 3)} comments
+                      </span>
                     </div>
                   </div>
                   <div className="text-right ml-6">
-                    <div className="text-3xl font-bold text-purple-400">{idea.aiScore}</div>
+                    <div className="text-3xl font-bold text-purple-400">{score}</div>
                     <div className="text-xs text-gray-500">AI Score</div>
                   </div>
                 </div>
