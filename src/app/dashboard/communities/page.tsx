@@ -1,6 +1,7 @@
-﻿import { CreateCommunityModal } from "./CreateCommunityModal";
+﻿import Link from "next/link";
+import { CreateCommunityModal } from "./CreateCommunityModal";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Plus } from "lucide-react";
+import { Users } from "lucide-react";
 import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -26,48 +27,73 @@ export default async function CommunitiesPage() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Communities</h1>
-          <p className="text-gray-400 mt-1">Organize your followers into interest-based groups.</p>
+          <h1 className="text-3xl font-bold text-white">Communities</h1>
+          <p className="text-gray-400 mt-1">
+            Organize your followers into interest-based groups.
+          </p>
         </div>
         <CreateCommunityModal />
       </div>
 
       <div className="grid grid-cols-3 gap-6">
         {communities.map((community) => (
-          <Card key={community.id} className="bg-gray-900 border-gray-800 hover:border-purple-500/50 cursor-pointer transition-all">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 rounded-full ${colorMap[community.name] || "bg-gray-500"} flex items-center justify-center text-white font-bold text-lg`}>
-                  {community.icon || community.name[0]}
+          <Link
+            key={community.id}
+            href={`/dashboard/communities/${community.id}`}
+            className="block"
+          >
+            <Card className="bg-gray-900 border-gray-800 hover:border-purple-500/50 cursor-pointer transition-all h-full">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-12 h-12 rounded-full ${
+                      colorMap[community.name] || "bg-gray-500"
+                    } flex items-center justify-center text-white font-bold text-lg`}
+                  >
+                    {community.icon || community.name[0]}
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg text-white">
+                      {community.name}
+                    </CardTitle>
+                    <p className="text-sm text-gray-400 flex items-center gap-1">
+                      <Users size={12} /> {community._count.members} members ·{" "}
+                      {community._count.ideas} ideas
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <CardTitle className="text-lg text-white">{community.name}</CardTitle>
-                  <p className="text-sm text-gray-400 flex items-center gap-1">
-                    <Users size={12} /> {community._count.members} members · {community._count.ideas} ideas
-                  </p>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-400 mb-4">
+                  {community.description}
+                </p>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-gray-500">Engagement</span>
+                  <span className="text-purple-400 font-bold">
+                    {Math.min(95, 60 + community._count.ideas * 5)}%
+                  </span>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-400 mb-4">{community.description}</p>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-500">Engagement</span>
-                <span className="text-purple-400 font-bold">{Math.min(95, 60 + community._count.ideas * 5)}%</span>
-              </div>
-              <div className="w-full bg-gray-800 rounded-full h-1.5 mt-2">
-                <div
-                  className="bg-purple-500 h-1.5 rounded-full"
-                  style={{ width: `${Math.min(95, 60 + community._count.ideas * 5)}%` }}
-                ></div>
-              </div>
-            </CardContent>
-          </Card>
+                <div className="w-full bg-gray-800 rounded-full h-1.5 mt-2">
+                  <div
+                    className="bg-purple-500 h-1.5 rounded-full"
+                    style={{
+                      width: `${Math.min(
+                        95,
+                        60 + community._count.ideas * 5
+                      )}%`,
+                    }}
+                  ></div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </div>
 
       {communities.length === 0 && (
         <div className="text-center py-12 text-gray-500">
-          No communities yet. Click "Create Community" to get started.
+          No communities yet. Click &quot;Create Community&quot; to get
+          started.
         </div>
       )}
     </div>
