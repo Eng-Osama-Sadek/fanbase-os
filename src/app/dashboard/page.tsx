@@ -106,9 +106,12 @@ export default function DashboardOverview() {
                   <span className="text-blue-400 font-semibold">Idea:</span> Community member suggested a 30-Day Challenge.
                 </div>
               </div>
-              <button className="w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors">
-                Open AI Chat
-              </button>
+              <a
+  href="/dashboard/ai-chat"
+  className="block w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors text-center text-white"
+>
+  Open AI Chat
+</a>
             </CardContent>
           </Card>
         </div>
