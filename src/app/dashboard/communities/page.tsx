@@ -1,4 +1,5 @@
-﻿import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+﻿import { CreateCommunityModal } from "./CreateCommunityModal";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Plus } from "lucide-react";
 import { prisma } from "@/lib/db";
 
@@ -28,9 +29,7 @@ export default async function CommunitiesPage() {
           <h1 className="text-3xl font-bold">Communities</h1>
           <p className="text-gray-400 mt-1">Organize your followers into interest-based groups.</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors">
-          <Plus size={16} /> Create Community
-        </button>
+        <CreateCommunityModal />
       </div>
 
       <div className="grid grid-cols-3 gap-6">
