@@ -1,31 +1,90 @@
-﻿"use client";
+﻿import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Lightbulb, MessageSquare } from "lucide-react";
+import { prisma } from "@/lib/db";
 
-export default function DashboardOverview() {
+export const dynamic = "force-dynamic";
+
+const colorMap: Record<string, string> = {
+  Developers: "bg-blue-500",
+  Designers: "bg-pink-500",
+  Investors: "bg-yellow-500",
+  Musicians: "bg-purple-500",
+  "Fitness Enthusiasts": "bg-green-500",
+  "Content Creators": "bg-orange-500",
+};
+
+export default async function DashboardOverview() {
+  const [communities, ideas, counts] = await Promise.all([
+    prisma.community.findMany({
+      include: { _count: { select: { members: true, ideas: true } } },
+      orderBy: { createdAt: "asc" },
+      take: 6,
+    }),
+    prisma.idea.findMany({
+      include: { author: true, community: true },
+      orderBy: { aiScore: "desc" },
+      take: 5,
+    }),
+    Promise.all([
+      prisma.user.count(),
+      prisma.community.count(),
+      prisma.idea.count(),
+      prisma.message.count(),
+    ]),
+  ]);
+
+  const [userCount, communityCount, ideaCount, messageCount] = counts;
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Good morning, Creator! 👋</h1>
+        <h1 className="text-3xl font-bold text-white">
+          Good morning, Creator! 👋
+        </h1>
         <div className="flex items-center gap-2 text-sm text-gray-400">
-          <span className="w-2 h-2 rounded-full bg-green-500"></span> AI Representative Active
+          <span className="w-2 h-2 rounded-full bg-green-500"></span> AI
+          Representative Active
         </div>
       </div>
 
+      {/* Stats Grid */}
       <div className="grid grid-cols-4 gap-4">
         {[
-          { title: "Total Followers", value: "700K", icon: Users, change: "+12% this week" },
-          { title: "Community Members", value: "120K", icon: Users, change: "+5% this week" },
-          { title: "Active Ideas", value: "340", icon: Lightbulb, change: "+24 new" },
-          { title: "Unread DMs", value: "1.2K", icon: MessageSquare, change: "87 important" },
+          {
+            title: "Total Followers",
+            value: "700K",
+            icon: Users,
+            change: "+12% this week",
+          },
+          {
+            title: "Community Members",
+            value: `${communityCount}`,
+            icon: Users,
+            change: `+${userCount} users`,
+          },
+          {
+            title: "Active Ideas",
+            value: `${ideaCount}`,
+            icon: Lightbulb,
+            change: "Live from DB",
+          },
+          {
+            title: "Unread DMs",
+            value: `${messageCount}`,
+            icon: MessageSquare,
+            change: "AI filtered",
+          },
         ].map((stat) => (
           <Card key={stat.title} className="bg-gray-900 border-gray-800">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">{stat.title}</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-400">
+                {stat.title}
+              </CardTitle>
               <stat.icon className="h-4 w-4 text-purple-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-2xl font-bold text-white">{stat.value}</div>
               <p className="text-xs text-gray-500 mt-1">{stat.change}</p>
             </CardContent>
           </Card>
@@ -33,58 +92,95 @@ export default function DashboardOverview() {
       </div>
 
       <div className="grid grid-cols-3 gap-8">
+        {/* Communities */}
         <div className="col-span-2 space-y-4">
-          <h2 className="text-xl font-semibold flex items-center gap-2">
-            <Users className="text-purple-500" /> Your Communities
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold flex items-center gap-2 text-white">
+              <Users className="text-purple-500" /> Your Communities
+            </h2>
+            <Link
+              href="/dashboard/communities"
+              className="text-sm text-purple-400 hover:text-purple-300"
+            >
+              View all →
+            </Link>
+          </div>
           <div className="grid grid-cols-3 gap-4">
-            {[
-              { name: "Developers", members: "4.2k", color: "bg-blue-500" },
-              { name: "Designers", members: "3.8k", color: "bg-pink-500" },
-              { name: "Investors", members: "1.2k", color: "bg-yellow-500" },
-              { name: "Musicians", members: "2.5k", color: "bg-purple-500" },
-              { name: "Fitness Enthusiasts", members: "5.1k", color: "bg-green-500" },
-              { name: "Content Creators", members: "6.3k", color: "bg-orange-500" },
-            ].map((community) => (
-              <Card key={community.name} className="bg-gray-900 border-gray-800 hover:border-purple-500/50 cursor-pointer transition-all">
-                <CardContent className="p-4 flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-full ${community.color} flex items-center justify-center text-white font-bold`}>
-                    {community.name[0]}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">{community.name}</h3>
-                    <p className="text-sm text-gray-400">{community.members} members</p>
-                  </div>
-                </CardContent>
-              </Card>
+            {communities.map((community) => (
+              <Link
+                key={community.id}
+                href={`/dashboard/communities/${community.id}`}
+                className="block"
+              >
+                <Card className="bg-gray-900 border-gray-800 hover:border-purple-500/50 cursor-pointer transition-all h-full">
+                  <CardContent className="p-4 flex items-center gap-4">
+                    <div
+                      className={`w-10 h-10 rounded-full ${
+                        colorMap[community.name] || "bg-gray-500"
+                      } flex items-center justify-center text-white font-bold`}
+                    >
+                      {community.icon || community.name[0]}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-white">
+                        {community.name}
+                      </h3>
+                      <p className="text-sm text-gray-400">
+                        {community._count.members} members ·{" "}
+                        {community._count.ideas} ideas
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
 
-          <h2 className="text-xl font-semibold flex items-center gap-2 mt-8">
-            <Lightbulb className="text-yellow-500" /> Top Ideas from Your Community
+          {/* Top Ideas */}
+          <h2 className="text-xl font-semibold flex items-center gap-2 mt-8 text-white">
+            <Lightbulb className="text-yellow-500" /> Top Ideas from Your
+            Community
           </h2>
           <div className="space-y-3">
-            {[
-              { title: "AI writes a book", author: "Sarah M.", score: 92, status: "PROMOTED" },
-              { title: "Art Supply Toolkit", author: "John D.", score: 88, status: "APPROVED" },
-              { title: "Cobra Yoga moves", author: "Mike R.", score: 75, status: "PENDING" },
-            ].map((idea) => (
-              <div key={idea.title} className="flex items-center justify-between p-4 bg-gray-900 border border-gray-800 rounded-lg">
-                <div>
-                  <h4 className="font-medium">{idea.title}</h4>
-                  <p className="text-sm text-gray-500">by {idea.author}</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className={`px-2 py-1 text-xs rounded-full ${idea.status === 'PROMOTED' ? 'bg-green-900 text-green-300' : 'bg-gray-800 text-gray-400'}`}>
-                    {idea.status}
-                  </span>
-                  <span className="text-purple-400 font-bold">{idea.score}/100</span>
-                </div>
-              </div>
-            ))}
+            {ideas.map((idea) => {
+              const score = idea.aiScore ?? 0;
+              const statusColor =
+                idea.status === "PROMOTED"
+                  ? "bg-green-900 text-green-300"
+                  : idea.status === "APPROVED"
+                  ? "bg-blue-900 text-blue-300"
+                  : "bg-gray-800 text-gray-400";
+              return (
+                <Link
+                  key={idea.id}
+                  href="/dashboard/ideas"
+                  className="block"
+                >
+                  <div className="flex items-center justify-between p-4 bg-gray-900 border border-gray-800 rounded-lg hover:border-purple-500/30 transition-all">
+                    <div>
+                      <h4 className="font-medium text-white">{idea.title}</h4>
+                      <p className="text-sm text-gray-500">
+                        by {idea.author.name} · in {idea.community.name}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full ${statusColor}`}
+                      >
+                        {idea.status}
+                      </span>
+                      <span className="text-purple-400 font-bold">
+                        {score}/100
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
 
+        {/* AI Representative Widget */}
         <div className="col-span-1">
           <Card className="bg-gray-900 border-gray-800 sticky top-8">
             <CardHeader>
@@ -97,21 +193,28 @@ export default function DashboardOverview() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-gray-400">I have organized your inbox and found 3 high-value opportunities today.</p>
+              <p className="text-sm text-gray-400">
+                I've organized your inbox and found 3 high-value opportunities
+                today.
+              </p>
               <div className="space-y-2">
-                <div className="p-3 bg-gray-800 rounded-lg text-sm">
-                  <span className="text-green-400 font-semibold">Opportunity:</span> Collab with @TechGuru on AI tools.
+                <div className="p-3 bg-gray-800 rounded-lg text-sm text-gray-300">
+                  <span className="text-green-400 font-semibold">
+                    Opportunity:
+                  </span>{" "}
+                  Collab with @TechGuru on AI tools.
                 </div>
-                <div className="p-3 bg-gray-800 rounded-lg text-sm">
-                  <span className="text-blue-400 font-semibold">Idea:</span> Community member suggested a 30-Day Challenge.
+                <div className="p-3 bg-gray-800 rounded-lg text-sm text-gray-300">
+                  <span className="text-blue-400 font-semibold">Idea:</span>{" "}
+                  Community member suggested a 30-Day Challenge.
                 </div>
               </div>
-              <a
-  href="/dashboard/ai-chat"
-  className="block w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors text-center text-white"
->
-  Open AI Chat
-</a>
+              <Link
+                href="/dashboard/ai-chat"
+                className="block w-full py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-sm font-medium transition-colors text-center text-white"
+              >
+                Open AI Chat
+              </Link>
             </CardContent>
           </Card>
         </div>
