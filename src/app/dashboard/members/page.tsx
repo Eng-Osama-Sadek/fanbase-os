@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { UserPlus, Search, Star, TrendingUp } from "lucide-react";
 
@@ -25,10 +25,7 @@ export default function MembersPage() {
         </div>
         <div className="flex items-center gap-2 px-4 py-2 bg-gray-900 border border-gray-800 rounded-lg">
           <Search size={16} className="text-gray-500" />
-          <input
-            placeholder="Search members..."
-            className="bg-transparent outline-none text-sm w-48 text-white placeholder-gray-500"
-          />
+          <input placeholder="Search members..." className="bg-transparent outline-none text-sm w-48 text-white placeholder-gray-500" />
         </div>
       </div>
 
@@ -45,9 +42,7 @@ export default function MembersPage() {
                     <h3 className="font-semibold text-white">{member.name}</h3>
                     <Star className="text-yellow-500" size={14} />
                   </div>
-                  <p className="text-xs text-gray-500">
-                    {member.handle} · {member.community}
-                  </p>
+                  <p className="text-xs text-gray-500">{member.handle} · {member.community}</p>
                   <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
                     <span>{member.ideas} ideas</span>
                     <span className="flex items-center gap-1 text-purple-400">
