@@ -1,4 +1,4 @@
-﻿generator client {
+generator client {
   provider = "prisma-client-js"
 }
 
@@ -8,28 +8,29 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  clerkId       String    @unique
-  name          String
-  email         String    @unique
-  imageUrl      String?
-  role          String    @default("FAN")
-  communities   CommunityMember[]
-  ideas         Idea[]
-  messages      Message[]
-  createdAt     DateTime  @default(now())
+  id                 String            @id @default(cuid())
+  clerkId            String            @unique
+  name               String
+  email              String            @unique
+  imageUrl           String?
+  role               String            @default("FAN")
+  communities        CommunityMember[]
+  createdCommunities Community[]       @relation("CreatorCommunities")
+  ideas              Idea[]
+  messages           Message[]
+  createdAt          DateTime          @default(now())
 }
 
 model Community {
-  id          String   @id @default(cuid())
+  id          String            @id @default(cuid())
   name        String
   description String
   icon        String
   creatorId   String
-  creator     User     @relation(fields: [creatorId], references: [id])
+  creator     User              @relation("CreatorCommunities", fields: [creatorId], references: [id])
   members     CommunityMember[]
   ideas       Idea[]
-  createdAt   DateTime @default(now())
+  createdAt   DateTime          @default(now())
 }
 
 model CommunityMember {
@@ -43,28 +44,28 @@ model CommunityMember {
 }
 
 model Idea {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   content     String
-  status      String   @default("PENDING")
+  status      String    @default("PENDING")
   aiSummary   String?
   aiScore     Int?
   authorId    String
-  author      User     @relation(fields: [authorId], references: [id])
+  author      User      @relation(fields: [authorId], references: [id])
   communityId String
   community   Community @relation(fields: [communityId], references: [id])
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 }
 
 model Message {
-  id          String   @id @default(cuid())
-  content     String
-  senderName  String
+  id           String   @id @default(cuid())
+  content      String
+  senderName   String
   senderHandle String?
-  platform    String
-  category    String?
-  aiSummary   String?
-  creatorId   String
-  creator     User     @relation(fields: [creatorId], references: [id])
-  createdAt   DateTime @default(now())
+  platform     String
+  category     String?
+  aiSummary    String?
+  creatorId    String
+  creator      User     @relation(fields: [creatorId], references: [id])
+  createdAt    DateTime @default(now())
 }
