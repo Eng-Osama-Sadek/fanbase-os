@@ -10,9 +10,11 @@ datasource db {
 model User {
   id                 String            @id @default(cuid())
   clerkId            String            @unique
+  username           String?           @unique
   name               String
   email              String            @unique
   imageUrl           String?
+  bio                String?
   role               String            @default("FAN")
   communities        CommunityMember[]
   createdCommunities Community[]       @relation("CreatorCommunities")
