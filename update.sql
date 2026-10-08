@@ -1,0 +1,1 @@
+UPDATE "Community" SET "creatorId" = (SELECT id FROM "User" WHERE username = 'alex-creator');
