@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { ArrowLeft, Users, Lightbulb } from "lucide-react";
+import { JoinButton } from "./JoinButton";
+import { SubmitIdeaForm } from "./SubmitIdeaForm";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +42,7 @@ export default async function PublicCommunityPage({
           <div className="w-16 h-16 rounded-2xl bg-purple-600 flex items-center justify-center text-3xl">
             {community.icon || community.name[0]}
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl font-bold">{community.name}</h1>
             <p className="text-gray-400 mt-1">{community.description}</p>
             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
@@ -52,6 +54,11 @@ export default async function PublicCommunityPage({
               </span>
             </div>
           </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <JoinButton communityId={community.id} />
+          <SubmitIdeaForm communityId={community.id} />
         </div>
 
         <div>
